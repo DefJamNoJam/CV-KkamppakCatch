@@ -1,152 +1,57 @@
-# KKAM_AI
-### 데이터 전처리
-- 동영상(3fps/sec) label 별 영상 분리 및 데이터파일 재구성
-- 프레임 별 라벨 할당 (Normal, Fall, Theft, Break)
-- 영상 처리 (224*224), 채널 단위 Z-score 정규화
+# ✨ 깜빡 캐치 (KKAM): AI 기반 무인 매장 이상 행동 감지 서비스
 
-### AI 모델 구조
-- Resnet18 + Bidirectional LSTM
+[cite_start]"깜빡 캐치"는 무인 매장의 CCTV 영상을 실시간으로 분석하여 절도, 파손 등 이상 행동을 3초 이내에 탐지하고 점주에게 알림을 제공하는 AI 기반 감지 서비스입니다.  "깜빡" 놓친 사이에도 즉시 Catch! [cite_start]라는 슬로건처럼, 순간적인 이상행동을 포착하고 빠르게 잡아내는 기술력을 강조합니다. 
 
-### 학습 전략
-- Multi-label classification (4-class)
-- BCE + sigmoid: 각 클래스에 대한 **독립적인 2진 분류(binary classification)** 수행
-- Validation loss 기반 best model 가중치 업데이트
-  
-#### 하이퍼파라미터 세팅
-```
-    # 학습 파라미터
-    parser.add_argument('--epochs', default=50, help='number of training epochs')
-    parser.add_argument('--batch-size', default=4, help='batch size per GPU')
-    parser.add_argument('--lr', default=1e-4, help='learning rate')
+## 📚 프로젝트 개요
 
-    # 데이터셋 파라미터
-    parser.add_argument('--window-size', default=2, help='time window size for clip (sec)')
-    parser.add_argument('--num-workers', default=4, help='number of DataLoader workers')
-    parser.add_argument('--fps', default=3, help='number of frames per clip (3fps)') 
+[cite_start]무인 매장의 확산과 함께 인력 감시 공백이 발생하여 범죄 발생 건수가 증가하고 있습니다.  [cite_start]절도, 폭행, 기물 파손 등으로 인한 매출 손실, 법적 분쟁, 고객 불안 등의 문제가 심각하며, 기존 CCTV는 사후 분석만 가능하여 즉각적인 조치가 어렵습니다. 
 
-    # 모델 파라미터
-    parser.add_argument('--hidden-dim', default=256, help='LSTM hidden dimension')
-    parser.add_argument('--num-layers', default=1, help='number of LSTM layers')
-    parser.add_argument('--num-classes', default=4, help='number of anomaly classes; default = auto from dataset')
-    parser.add_argument('--bidirectional', default=True, help='use bidirectional LSTM')
-    parser.add_argument('--freeze-backbone', default=False, help='freeze ResNet backbone weights')
+[cite_start]깜빡 캐치는 이러한 문제점을 해결하기 위해 개발되었습니다.  [cite_start]24시간 CCTV 모니터링을 통해 이상 행동을 신속하게 탐지하고 점주에게 알림을 제공하여, 무인 매장의 안정성과 운영 효율을 확보하는 것을 목표로 합니다. 
 
+## 💡 주요 기능
 
-```
+깜빡 캐치는 다음과 같은 핵심 기능들을 제공합니다:
 
+* [cite_start]**실시간 이상 행동 감지:** YOLOv8 경량 모델과 ResNet18 + Bi-LSTM 모델을 활용하여 CCTV 영상에서 전도, 절도, 파손 등 다양한 이상 행동을 3초 이내에 80% 이상의 확률로 분류하고 탐지합니다. 
+* [cite_start]**모바일 애플리케이션 알림 서비스:** 이상 행동 감지 시 점주의 스마트폰으로 즉시 알림을 발송하여 실시간 대응을 가능하게 합니다.  [cite_start]로그인, 실시간 영상 피드, 이상 행동 알림, 설정 페이지 등의 기능을 제공합니다. 
+* [cite_start]**웹 기반 관리 시스템:** 점포 등록, 사용자 및 가게 목록 관리, 서비스 안내 및 요금 안내 등 웹 기반의 관리자 페이지를 통해 무인 매장 관리를 지원합니다. 
+* [cite_start]**데이터 기반 증거 확보:** 이상 현상 발생 시 해당 데이터를 저장하여 법적 근거 확보를 용이하게 합니다. 
+* [cite_start]**얼굴 블러링 (익명화):** 영상 속 객체 탐지 및 트래킹 과정에서 얼굴을 블러링 처리하여 프라이버시를 보호합니다. 
 
-# KKAM Homepage
-## React + TypeScript + Vite
+## 🛠️ 프로젝트 구성 (아키텍처)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+깜빡 캐치 프로젝트는 다음과 같은 주요 구성 요소로 이루어져 있습니다:
 
-Currently, two official plugins are available:
+* [cite_start]**데이터 수집:** AI Hub의 실내(편의점, 매장) 사람 이상행동 데이터를 활용했습니다. 
+* [cite_start]**데이터 전처리:** 동영상 프레임별 라벨 할당, 영상 크기 통일(224x224), 채널 단위 Z-score 정규화, XML에서 이상행동 구간 추출, Positive/Normal npy 파일 생성 등의 과정을 거칩니다. 
+* [cite_start]**AI 모델:** ResNet18 백본과 Bi-LSTM 레이어로 구성된 VAModel을 사용하여 이상 행동을 분류하고 예측합니다.  [cite_start]YOLOv8n 기반 객체 탐지와 DeepSort 기반 트래킹을 통해 실시간 모니터링 시스템을 구축합니다. 
+* [cite_start]**데이터베이스:** SupaBase DB에 이상 행동 클래스를 저장합니다. 
+* **애플리케이션:**
+    * [cite_start]**모바일 앱 (Android - Kotlin):** 실시간 영상 피드 및 알림을 제공합니다. 
+    * [cite_start]**웹 앱 (Frontend):** 점주용 관리 및 서비스 신청 웹페이지를 제공합니다. 
+    * **백엔드:** 데이터 처리 및 API 연동을 담당합니다.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 주요 기술 스택 (전체 프로젝트)
 
-## Expanding the ESLint configuration
+* **언어:** Python, Kotlin, [사용된 웹 프론트엔드 언어, 예: TypeScript/JavaScript]
+* **AI/모델링:** ResNet18, Bi-LSTM, YOLOv8n, DeepSort, PyTorch, OpenCV
+* **모바일 개발:** Android SDK, Socket.IO, Android Notification Channel/API, MediaPlayer
+* **데이터베이스:** Supabase DB
+* [cite_start]**협업 도구:** Slack, GitHub, Notion 
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🤝 팀 소개
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+[cite_start]"깜빡 캐치" 프로젝트는 다음과 같은 역할의 팀원들이 협업하여 개발되었습니다: 
+* [cite_start]**PM (Project Manager):** 이재봉 
+* [cite_start]**Data Engineer:** 김태호 (본인) 
+* [cite_start]**AI Engineer:** 박서현 
+* [cite_start]**Frontend:** 박세은 
+[cite_start]팀원들은 애자일 방식으로 다른 팀 업무를 동시에 진행하기도 했습니다. 
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## ✨ 주요 성과 및 회고
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
-
-### KKAM_Android
-
-
-<p align="center">
-![ui내용](https://github.com/user-attachments/assets/ad90f512-afc7-4191-ae0c-ce5fddf9c2d9)
-</p>
-
-## 개요
-무인 CCTV 영상을 실시간으로 분석하여 이상 행동(정상, 전도, 절도, 파손)을 탐지하는 Android 애플리케이션입니다. 
-
-## 주요 기능
-- **로그인 화면**
-  - 이메일, 비밀번호 로그인 
-- **메인 페이지**
-  - 실시간 영상 스트리밍  
-- **이상 행동 검출**  
-  - 정상  
-  - 전도
-  - 절도
-  - 파손  
-- **알림 전송**
-  - 알림 발생 조건
-  - 푸시 알림 또는 소리 알림 전송 
-- **로컬 및 원격 설정 관리**  
-  - 사용자 환경설정 항목
-
-##  프로젝트 구조
-
-```plaintext
-.
-├── android/
-│   ├── app/
-│   │   ├── src/
-│   │   │   ├── main/
-│   │   │   │   ├── java/com/example/kkam_backend/
-│   │   │   │   │   ├── ui/
-│   │   │   │   │   │   └── MainActivity.kt         # 화면 진입점
-│   │   │   │   │   └── util/
-│   │   │   │   │       └── NotificationHelper.kt   # 알림 관리 유틸
-│   │   │   │   └── res/
-│   │   │   │       ├── layout/                      # XML 레이아웃
-│   │   │   │       ├── drawable/
-│   │   │   │       └── raw/
-│   │   │   │           └── alert_sound.mp3         # 경고음 파일
-│   │   │   └── assets/                              # TFLite 모델 등
-│   │   └── build.gradle.kts    
-│   └── settings.gradle.kts     
-├── gradle/                     
-├── .gitignore                  
-├── build.gradle.kts            
-├── gradle.properties           
-├── gradlew / gradlew.bat       
-└── tree.txt                    
-
-```
-
-## 기술 스택
-- 언어, 프레임워크 : Kotlin
-- 라이브러리 : Socket.IO (네트워크), Engine.IOWebSocket 트랜스포트 (이미지 로딩), Andriod Notification Channel/API(알림), MediaPlayer (사운드 재생)
+* [cite_start]**실시간 이상 감지 기술 내재화:** 영상 스트리밍 기반의 실시간 처리 파이프라인 구축에 성공했으며, 특정 이상행동을 지연 없이 탐지 가능합니다. 
+* [cite_start]**무인 환경에 적합한 안정성과 운영 효율 확보:** 24시간 자동 감시 및 알림 기반 이벤트 감지를 통해 점주의 즉각적인 대응 가능성을 향상시켰습니다. 
+* [cite_start]**상업적 확장 가능성:** 모듈화된 구조 설계로 다양한 업종 확장 및 추가 기능(혼잡도 분석, 재고 예측 등) 도입 가능성을 확보했습니다. 
+* [cite_start]**실제 서비스 개발 경험 축적:** PoC(개념 증명) 수준을 넘는 프로덕션 수준의 프로토타입 구축 경험을 쌓았습니다. 
+* [cite_start]**개선 과제:** 시간/요일별 고객 방문 패턴 분석 기능 미비, 점주를 위한 통합 관리 시스템 확장 필요, DB와 앱 연동 개선 필요 등의 개선 과제가 존재합니다.
