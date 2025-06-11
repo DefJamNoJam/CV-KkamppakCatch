@@ -95,8 +95,7 @@ export default tseslint.config({
 
 
 <p align="center">
-  <img src="ui내용.png" width="300" alt="로그인 화면">
-  <img src="ui내용2.png" width="300" alt="메인 화면">
+![ui내용](https://github.com/user-attachments/assets/ad90f512-afc7-4191-ae0c-ce5fddf9c2d9)
 </p>
 
 ## 개요
